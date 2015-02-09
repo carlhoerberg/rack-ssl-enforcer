@@ -120,6 +120,8 @@ module Rack
         'https'
       elsif @request.env['HTTP_X_FORWARDED_PROTO']
         @request.env['HTTP_X_FORWARDED_PROTO'].split(',')[0] || @request.scheme
+      elsif @request.env['HTTP_CLOUDFRONT_FORWARDED_PROTO']
+        @request.env['HTTP_CLOUDFRONT_FORWARDED_PROTO'].split(',')[0]
       else
         @request.scheme
       end

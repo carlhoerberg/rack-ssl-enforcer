@@ -18,6 +18,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'https://www.example.org/', last_response.location
     end
 
+    should 'respect CloudFront-Forwarded-Proto header for AWS CloudFront proxied SSL' do
+      get 'http://www.example.org/', {}, { 'HTTP_CLOUDFRONT_FORWARDED_PROTO' => 'http', 'rack.url_scheme' => 'http' }
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
     should 'respect rack.url_scheme header for proxied SSL when HTTP_X_FORWARDED_PROTO blank' do
       get 'http://www.example.org/', {}, { 'HTTP_X_FORWARDED_PROTO' => '', 'rack.url_scheme' => 'http' }
       assert_equal 301, last_response.status
@@ -32,6 +38,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
     should 'not redirect SSL requests and respect X-Forwarded-Proto header for proxied SSL' do
       get 'http://www.example.org/', {}, { 'HTTP_X_FORWARDED_PROTO' => 'https', 'rack.url_scheme' => 'http' }
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect SSL requests and respect CloudFront-Forwarded-Proto header for AWS CloudFront proxied SSL' do
+      get 'http://www.example.org/', {}, { 'HTTP_CLOUDFRONT_FORWARDED_PROTO' => 'https', 'rack.url_scheme' => 'http' }
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
