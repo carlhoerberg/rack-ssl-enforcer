@@ -43,7 +43,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
 
     should 'not redirect SSL requests and respect CloudFront-Forwarded-Proto header for AWS CloudFront proxied SSL' do
-      get 'http://www.example.org/', {}, { 'HTTP_CLOUDFRONT_FORWARDED_PROTO' => 'https', 'rack.url_scheme' => 'http' }
+      get 'http://www.example.org/', {}, { 'HTTP_CLOUDFRONT_FORWARDED_PROTO' => 'https', 'HTTP_X_FORWARDED_PROTO' => 'http', 'rack.url_scheme' => 'http' }
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
